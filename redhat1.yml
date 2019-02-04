@@ -1,0 +1,72 @@
+# RHEL 7 STIG: Packages to add/remove
+stig_packages_rhel7:
+  - packages:
+      - audispd-plugins
+      - audit
+      - aide
+      - dracut-fips
+      - dracut-fips-aesni
+      - openssh-clients
+      - openssh-server
+      - screen
+    state: "{{ security_package_state }}"
+    enabled: True
+  - packages:
+      - libselinux-python
+      - policycoreutils-python
+      - selinux-policy
+      - selinux-policy-targeted
+    state: "{{ security_package_state }}"
+    enabled: "{{ security_rhel7_enable_linux_security_module }}"
+  - packages:
+      - chrony
+    state: "{{ security_package_state }}"
+    enabled: "{{ security_rhel7_enable_chrony }}"
+  - packages:
+      - clamav
+      - clamav-data
+      - clamav-devel
+      - clamav-filesystem
+      - clamav-lib
+      - clamav-scanner-systemd
+      - clamav-server-systemd
+      - clamav-server
+      - clamav-update
+    state: "{{ security_package_state }}"
+    enabled: "{{ security_enable_virus_scanner }}"
+  - packages:
+      - firewalld
+    state: "{{ security_package_state }}"
+    enabled: "{{ security_enable_firewalld }}"
+  - packages:
+      - "{{ (ansible_pkg_mgr == 'yum') | ternary('yum-cron', 'dnf-automatic') }}"
+    state: "{{ security_package_state }}"
+    enabled: "{{ security_rhel7_automatic_package_updates }}"
+  - packages:
+      - rsh-server
+    state: absent
+    enabled: "{{ security_rhel7_remove_rsh_server }}"
+  - packages:
+      - telnet-server
+    state: absent
+    enabled: "{{ security_rhel7_remove_telnet_server }}"
+  - packages:
+      - tftp-server
+    state: absent
+    enabled: "{{ security_rhel7_remove_tftp_server }}"
+  - packages:
+      - xorg-x11-server-Xorg
+    state: absent
+    enabled: "{{ security_rhel7_remove_xorg }}"
+  - packages:
+      - ypserv
+    state: absent
+    enabled: "{{ security_rhel7_remove_ypserv }}"
+
+rpm_gpgchecks:
+  - regexp: "^gpgcheck.*"
+    line: "gpgcheck={{ security_enable_gpgcheck_packages | bool | ternary('1', 0) }}"
+  - regexp: "^localpkg_gpgcheck.*"
+    line: "localpkg_gpgcheck={{ security_enable_gpgcheck_packages_local | bool | ternary('1', 0) }}"
+  - regexp: "^repo_gpgcheck.*"
+    line: "repo_gpgcheck={{ security_enable_gpgcheck_repo | bool | ternary('1', 0) }}"
